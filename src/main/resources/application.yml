@@ -1,0 +1,43 @@
+# Sistema Semear — configuração da aplicação Java (Model + Controller).
+# Valores sensíveis vêm do .env da raiz ou de variáveis de ambiente. Ver docs/06-supabase-conexao.md.
+
+spring:
+  application:
+    name: semear
+  config:
+    import: optional:file:.env[.properties]
+  servlet:
+    multipart:
+      # Documentos de matrícula: até 5 MB por arquivo (validado também em ArquivoEnviado)
+      max-file-size: 5MB
+      max-request-size: 6MB
+  datasource:
+    url: ${SUPABASE_DB_URL}
+    username: ${SUPABASE_DB_USER}
+    password: ${SUPABASE_DB_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:5}
+      # O banco do Supabase está em UTC: sem isto, current_date (vencidas, inadimplência, obrigações)
+      # vira o dia seguinte depois das 21h de São Luís. O pooler não repassa o fuso enviado pelo driver.
+      connection-init-sql: SET TIME ZONE 'America/Fortaleza'
+# A validação do JWT (JWKS do Supabase, emissor e audiência) é configurada em security/SecurityConfig.
+
+server:
+  port: ${SERVER_PORT:8080}
+  # Atrás do proxy do Render: usa o IP real de quem acessa (X-Forwarded-For) no limite de contas e na evidência da assinatura.
+  forward-headers-strategy: framework
+
+semear:
+  supabase:
+    url: ${SUPABASE_URL}
+    secret-key: ${SUPABASE_SECRET_KEY:}
+    jwt-issuer: ${SUPABASE_URL}/auth/v1
+    jwt-audience: authenticated
+  cors:
+    origens: ${CORS_ORIGENS:http://localhost:5173}
+  cora:
+    modo: ${CORA_MODO:falso}
+    webhook-segredo: ${CORA_WEBHOOK_SEGREDO:}
+  jobs:
+    # Emissão de boletos, envio de avisos e rotina diária (AgendamentoFinanceiro)
+    ativos: ${SEMEAR_JOBS_ATIVOS:true}

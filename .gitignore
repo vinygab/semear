@@ -1,0 +1,28 @@
+# Segredos
+.env
+.env.*
+!.env.example
+
+# Supabase CLI
+supabase/.branches
+supabase/.temp
+
+# Java / Maven (build gera também target/classes/static com a View compilada)
+target/
+*.class
+*.log
+hs_err_pid*
+
+# Node / Vite (View)
+node_modules/
+dist/
+.vercel
+.vite/
+
+# IDEs e sistema
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
